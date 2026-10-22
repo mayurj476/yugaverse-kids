@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Shape Friends">
+  <meta name="theme-color" content="#6ccfff">
+  <title>Shape Friends</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Background scenery -->
+  <div id="sky" aria-hidden="true">
+    <div class="sun"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="hill h1"></div>
+    <div class="hill h2"></div>
+  </div>
+
+  <!-- Play area: holes on top tray, shapes on bottom tray -->
+  <div id="board">
+    <div class="tray" id="trayTop"></div>
+    <div class="tray" id="trayBottom"></div>
+  </div>
+
+  <!-- Balloon game: numbered balloons float across the screen -->
+  <div id="balloonGame" aria-hidden="true"></div>
+
+  <div id="topbar">
+    <div id="stars"></div>
+    <div class="topBtns">
+      <button id="homeBtn" aria-label="Back to the menu (hold)">🏠</button>
+      <button id="muteBtn" aria-label="Sound on or off">🔊</button>
+    </div>
+  </div>
+
+  <div id="hintHand" aria-hidden="true">👆</div>
+
+  <!-- Letters game: "A for Apple" picture card -->
+  <div id="wordPop" aria-hidden="true"></div>
+
+  <!-- Level complete: clapping cat -->
+  <div id="celebrate" class="hidden" aria-hidden="true">
+    <div id="yay"></div>
+    <svg id="cat" viewBox="0 0 300 350">
+      <g class="catAll">
+        <g class="tail">
+          <path class="fur" d="M212 290 C270 286 292 226 270 172 C262 150 238 160 248 182 C262 216 250 252 208 262 Z"/>
+        </g>
+        <ellipse class="fur" cx="150" cy="268" rx="86" ry="72"/>
+        <ellipse class="belly" cx="150" cy="282" rx="52" ry="48"/>
+        <ellipse class="fur" cx="106" cy="330" rx="33" ry="17"/>
+        <ellipse class="fur" cx="194" cy="330" rx="33" ry="17"/>
+
+        <g class="head">
+          <path class="fur" d="M60 104 L76 16 L140 62 Z"/>
+          <path class="fur" d="M240 104 L224 16 L160 62 Z"/>
+          <path class="earIn" d="M78 86 L86 38 L120 64 Z"/>
+          <path class="earIn" d="M222 86 L214 38 L180 64 Z"/>
+          <ellipse class="fur" cx="150" cy="118" rx="98" ry="80"/>
+          <path class="stripe" d="M150 42 V62 M128 46 L133 64 M172 46 L167 64"/>
+          <g class="catEyes">
+            <ellipse cx="110" cy="110" rx="15" ry="19" fill="#2b2b2b"/>
+            <circle cx="115" cy="103" r="6" fill="#fff"/>
+            <circle cx="106" cy="118" r="3" fill="#fff"/>
+            <ellipse cx="190" cy="110" rx="15" ry="19" fill="#2b2b2b"/>
+            <circle cx="195" cy="103" r="6" fill="#fff"/>
+            <circle cx="186" cy="118" r="3" fill="#fff"/>
+          </g>
+          <ellipse class="cheek" cx="82" cy="142" rx="17" ry="10"/>
+          <ellipse class="cheek" cx="218" cy="142" rx="17" ry="10"/>
+          <path d="M141 131 Q150 126 159 131 Q150 143 141 131 Z" fill="#ff7aa8"/>
+          <path d="M124 148 Q150 158 176 148 Q150 186 124 148 Z" fill="#b5174f"/>
+          <path d="M137 162 Q150 178 163 162 Q150 168 137 162 Z" fill="#ff8fab"/>
+          <g class="whiskers">
+            <path d="M68 132 L18 122 M68 142 L16 146 M70 152 L24 168"/>
+            <path d="M232 132 L282 122 M232 142 L284 146 M230 152 L276 168"/>
+          </g>
+        </g>
+
+        <g class="clapFx">
+          <path d="M150 168 V150 M130 172 L118 158 M170 172 L182 158 M122 190 L104 188 M178 190 L196 188"/>
+        </g>
+
+        <g class="armL">
+          <line class="armLine" x1="95" y1="238" x2="138" y2="203"/>
+          <line class="armFill" x1="95" y1="238" x2="138" y2="203"/>
+          <circle class="fur" cx="140" cy="200" r="23"/>
+          <circle class="bean" cx="140" cy="205" r="7"/>
+          <circle class="bean" cx="130" cy="192" r="4"/>
+          <circle class="bean" cx="140" cy="188" r="4"/>
+          <circle class="bean" cx="150" cy="192" r="4"/>
+        </g>
+        <g class="armR">
+          <line class="armLine" x1="205" y1="238" x2="162" y2="203"/>
+          <line class="armFill" x1="205" y1="238" x2="162" y2="203"/>
+          <circle class="fur" cx="160" cy="200" r="23"/>
+          <circle class="bean" cx="160" cy="205" r="7"/>
+          <circle class="bean" cx="150" cy="192" r="4"/>
+          <circle class="bean" cx="160" cy="188" r="4"/>
+          <circle class="bean" cx="170" cy="192" r="4"/>
+        </g>
+      </g>
+    </svg>
+
+    <svg id="girl" viewBox="0 0 300 360">
+      <g class="girlAll">
+        <g class="notes">
+          <text class="note n1" x="34" y="90">♪</text>
+          <text class="note n2" x="246" y="70">♫</text>
+          <text class="note n3" x="258" y="200">♪</text>
+          <text class="note n4" x="22" y="220">♫</text>
+        </g>
+        <g class="legL"><path class="limb" d="M134 262 L128 316"/><ellipse class="shoe" cx="123" cy="322" rx="19" ry="10"/></g>
+        <g class="legR"><path class="limb" d="M166 262 L172 316"/><ellipse class="shoe" cx="177" cy="322" rx="19" ry="10"/></g>
+        <path class="dressFill" d="M122 168 Q150 158 178 168 L222 272 Q150 292 78 272 Z"/>
+        <path d="M84 270 Q150 288 216 270" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="2 9" stroke-linecap="round"/>
+        <circle class="dot" cx="132" cy="205" r="6"/><circle class="dot" cx="168" cy="222" r="6"/>
+        <circle class="dot" cx="118" cy="245" r="6"/><circle class="dot" cx="182" cy="252" r="6"/><circle class="dot" cx="150" cy="248" r="6"/>
+        <rect class="skin" x="140" y="148" width="20" height="24" rx="8"/>
+        <g class="gArmL"><path class="limb" d="M126 180 L86 214"/><circle class="skin" cx="82" cy="218" r="13"/></g>
+        <g class="gArmR"><path class="limb" d="M174 180 L214 214"/><circle class="skin" cx="218" cy="218" r="13"/></g>
+        <g class="gHead">
+          <g class="pigL"><circle class="hair" cx="80" cy="96" r="27"/><path class="bow" d="M96 72 L110 60 L112 82 Z M96 72 L84 58 L80 80 Z"/></g>
+          <g class="pigR"><circle class="hair" cx="220" cy="96" r="27"/><path class="bow" d="M204 72 L190 60 L188 82 Z M204 72 L216 58 L220 80 Z"/></g>
+          <circle class="skin" cx="150" cy="104" r="60"/>
+          <path class="hair" d="M90 102 C86 46 214 46 210 102 C204 84 190 72 170 70 C172 82 160 88 150 80 C140 88 122 86 124 72 C108 76 96 86 90 102 Z"/>
+          <g class="girlEyes">
+            <ellipse cx="128" cy="110" rx="8" ry="10" fill="#2b2b2b"/><circle cx="131" cy="106" r="3" fill="#fff"/>
+            <ellipse cx="172" cy="110" rx="8" ry="10" fill="#2b2b2b"/><circle cx="175" cy="106" r="3" fill="#fff"/>
+          </g>
+          <ellipse cx="114" cy="128" rx="11" ry="7" fill="#ff7aa8" opacity=".5"/>
+          <ellipse cx="186" cy="128" rx="11" ry="7" fill="#ff7aa8" opacity=".5"/>
+          <path d="M134 130 Q150 152 166 130 Q150 137 134 130 Z" fill="#c2185b"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <!-- Shown while the game is paused (app in the background / not in focus) -->
+  <div id="pausedOverlay" aria-label="Paused. Tap to play">
+    <div class="pauseCircle">
+      <svg viewBox="0 0 100 100"><path d="M38 26 L76 50 L38 74 Z" fill="#fff" stroke="#fff" stroke-width="10" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+
+  <!-- Start screen (also unlocks sound on iPad) -->
+  <div id="start">
+    <div id="startShapes" aria-hidden="true"></div>
+    <h1 id="title"></h1>
+    <div id="version"></div>
+    <div id="menu">
+      <button class="gameCard" id="cardShapes" data-game="shapes" aria-label="Shape game"></button>
+      <button class="gameCard" id="cardBalloons" data-game="balloons" aria-label="Balloon game"></button>
+      <button class="gameCard" id="cardLetters" data-game="letters" aria-label="Letters game"></button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
