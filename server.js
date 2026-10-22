@@ -1,4 +1,4 @@
-// Shape Friends - Copyright (c) 2026 mayurj476. All rights reserved.
+// YugaVerse Kids - Copyright (c) 2026 mayurj476. All rights reserved.
 // Not for copying, reuse or redistribution without written permission. See LICENSE.
 // Serves the game on your home network and shows the address to type on the iPad.
 // Usage: node server.js   (or double-click run.bat)
@@ -85,7 +85,7 @@ function lanAddresses() {
 function popup(message) {
   if (process.platform !== 'win32' || process.env.NO_POPUP) return;
   const text = message.replace(/'/g, "''");
-  const ps = `Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('${text}', 'Shape Friends - iPad address') | Out-Null`;
+  const ps = `Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('${text}', 'YugaVerse Kids - iPad address') | Out-Null`;
   spawn('powershell.exe', ['-NoProfile', '-WindowStyle', 'Hidden', '-Command', ps], {
     detached: true, stdio: 'ignore', windowsHide: true,
   }).unref();
@@ -103,7 +103,7 @@ function start(port) {
     const main = urls[0] || `http://localhost:${port}`;
 
     console.log('\n  ==============================================');
-    console.log('   Shape Friends is running!');
+    console.log('   YugaVerse Kids is running!');
     console.log('\n   On the iPad, open Safari and type:\n');
     console.log(`      ${main}\n`);
     if (urls.length > 1) {

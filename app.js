@@ -1,9 +1,9 @@
-// Shape Friends - Copyright (c) 2026 mayurj476. All rights reserved.
+// YugaVerse Kids - Copyright (c) 2026 mayurj476. All rights reserved.
 // Not for copying, reuse or redistribution without written permission. See LICENSE.
 (() => {
   'use strict';
 
-  const APP_VERSION = '10'; // shown in the corner of the start screen
+  const APP_VERSION = '14'; // shown in the corner of the start screen
   let updateReady = false;
   let appPaused = false; // true while the app is minimized, hidden or not in focus
 
@@ -12,7 +12,6 @@
   const trayTop = $('#trayTop');
   const trayBottom = $('#trayBottom');
   const starsEl = $('#stars');
-  const muteBtn = $('#muteBtn');
   const hand = $('#hintHand');
   const celebrateEl = $('#celebrate');
   const yayEl = $('#yay');
@@ -39,6 +38,15 @@
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
   };
+  // Parent settings. Kept on this device only; nothing is ever uploaded.
+  const settings = (() => {
+    const s = Object.assign({ lang: 'en', voice: true }, store.get('mlw_settings', {}));
+    return {
+      get lang() { return s.lang; },
+      get voiceOn() { return s.voice !== false; },
+      set(key, value) { s[key] = value; store.set('mlw_settings', s); },
+    };
+  })();
 
   // Restart a one-shot CSS animation class on an element.
   const ONE_SHOT = ['popin', 'happy', 'wiggle', 'no'];
@@ -200,16 +208,16 @@
     }
 
     // Looks for sounds/<name>.mp3, then .wav, then .m4a.
-    function loadSamples() {
+    function loadSamples(names = SAMPLE_NAMES) {
       if (!window.fetch || !location.protocol.startsWith('http')) return;
       const EXTS = ['mp3', 'wav', 'm4a'];
-      SAMPLE_NAMES.forEach((name) => {
+      names.forEach((name) => {
         const tryExt = (i) => {
           if (i >= EXTS.length) return; // no recording: use the built-in sound
           fetch(`sounds/${name}.${EXTS[i]}`)
             .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject()))
             .then((data) => new Promise((ok, fail) => ac.decodeAudioData(data, ok, fail)))
-            .then((buf) => { samples[name] = buf; })
+            .then((buf) => { samples[name] = buf; meta[name] = measure(buf); })
             .catch(() => tryExt(i + 1));
         };
         tryExt(0);
@@ -260,22 +268,37 @@
       param.linearRampToValueAtTime(peak, t + attack);
       param.setTargetAtTime(0, t + attack, decay / 4);
     }
+    // Loudest point, and when the sound first gets going (to skip silence at the start).
+    const meta = {};
+    function measure(buf) {
+      const d = buf.getChannelData(0);
+      let peak = 0;
+      for (let i = 0; i < d.length; i++) { const v = Math.abs(d[i]); if (v > peak) peak = v; }
+      const th = peak * 0.08;
+      let first = 0;
+      while (first < d.length && Math.abs(d[first]) <= th) first++;
+      return { peak: peak || 1, lead: first / buf.sampleRate };
+    }
     // Play a recording. maxDur (seconds) trims long files with a gentle fade at the end.
-    function sample(name, vol = 1, at = 0, maxDur = 0) {
+    // opts.skipSilence starts right where the sound begins; opts.normalize evens out loudness.
+    function sample(name, vol = 1, at = 0, maxDur = 0, opts = {}) {
       const buf = samples[name];
       if (!live() || !buf) return false;
+      const m = meta[name] || { peak: 1, lead: 0 };
+      const offset = opts.skipSilence ? Math.max(0, m.lead - 0.04) : 0;
+      if (opts.normalize) vol *= Math.min(2.5, 0.9 / m.peak);
       const src = ac.createBufferSource();
       src.buffer = buf;
       const g = ac.createGain();
       const t = ac.currentTime + at;
       g.gain.setValueAtTime(vol, t);
-      const trim = maxDur && maxDur < buf.duration;
+      const trim = maxDur && maxDur < buf.duration - offset;
       if (trim) {
         g.gain.setValueAtTime(vol, t + maxDur - 0.5);
         g.gain.linearRampToValueAtTime(0, t + maxDur);
       }
       src.connect(g); g.connect(master);
-      src.start(t);
+      src.start(t, offset);
       if (trim) src.stop(t + maxDur + 0.05);
       playing[name] = { src, g };
       src.onended = () => { if (playing[name] && playing[name].src === src) delete playing[name]; };
@@ -544,6 +567,38 @@
       meow() { return sample('meow'); },
       laugh(maxDur = 4) { return sample('laugh', 0.9, 0.2, maxDur); },
       has: (name) => !!samples[name],
+      // ---- tools for the game files (games/*.js) ----
+      registerSamples(names) {
+        const fresh = names.filter((n) => !SAMPLE_NAMES.includes(n));
+        fresh.forEach((n) => SAMPLE_NAMES.push(n));
+        if (ac && fresh.length) loadSamples(fresh);
+      },
+      play: (name, vol, at, maxDur, opts) => sample(name, vol, at, maxDur, opts),
+      fade: (name, secs) => fadeOut(name, secs),
+      // Building blocks for a game's own sounds. Everything made between startBus() and
+      // endBus() goes into one bus, so it can be faded out at once with fadeBus().
+      kit() {
+        if (!live()) return null;
+        return {
+          ac, noiseBuf, out, env, noise,
+          startBus() {
+            bus = ac.createGain();
+            bus.connect(master);
+            const room = ac.createGain();
+            room.gain.value = 0.22;
+            bus.connect(room); room.connect(reverb);
+            return bus;
+          },
+          endBus() { const b = bus; bus = null; return b; },
+        };
+      },
+      fadeBus(b, secs = 0.25) {
+        if (!ac || !b) return;
+        const t = ac.currentTime;
+        b.gain.setValueAtTime(b.gain.value, t);
+        b.gain.linearRampToValueAtTime(0, t + secs);
+        setTimeout(() => b.disconnect(), secs * 1000 + 100);
+      },
       // Freeze / unfreeze everything that is already playing.
       sleep() { if (ac && ac.state === 'running') ac.suspend().catch(() => {}); },
       wake() { if (ac && ac.state !== 'running') ac.resume().catch(() => {}); },
@@ -590,14 +645,39 @@
     }
     let current = null; // keep a reference, or some browsers never report "finished"
     // Returns true if it started speaking; onEnd runs once when the sentence is over.
-    function say(text, onEnd) {
-      if (!synth || audio.isMuted() || appPaused || !text) return false;
+    function say(text, onEnd) { return speak(text, chosen, chosen ? chosen.lang : 'en-US', onEnd, 0.92, 1.12); }
+
+    // Hindi and Marathi: best voice for that language. Many devices have no Marathi voice,
+    // so Marathi falls back to a Hindi voice (same Devanagari script). No voice at all -> silent.
+    const LANG = { hi: /^hi/i, mr: /^mr/i };
+    function bestFor(lang) {
+      if (!synth || !LANG[lang]) return null;
+      const nat = (v) => (/Natural|Neural|Online/i.test(v.name) ? 12 : 0) + (/Premium|Enhanced/i.test(v.name) ? 10 : 0) + (/Google/i.test(v.name) ? 6 : 0);
+      const list = synth.getVoices().filter((v) => LANG[lang].test(v.lang)).sort((a, b) => nat(b) - nat(a));
+      return list[0] || null;
+    }
+    function resolve(lang) {
+      if (lang === 'en' || !lang) return chosen ? { v: chosen, lang: 'en' } : null;
+      const v = bestFor(lang);
+      if (v) return { v, lang };
+      if (lang === 'mr') { const h = bestFor('hi'); if (h) return { v: h, lang: 'hi' }; }
+      return null;
+    }
+    function sayLang(text, lang, onEnd) {
+      if (lang === 'en' || !lang) return say(text, onEnd);
+      const r = resolve(lang);
+      return r ? speak(text, r.v, r.v.lang, onEnd, 0.85, 1.05) : false;
+    }
+
+    function speak(text, v, langCode, onEnd, rate, pitch) {
+      if (!synth || audio.isMuted() || !settings.voiceOn || appPaused || !text) return false;
       try {
         if (synth.speaking || synth.pending) synth.cancel();
         const u = new SpeechSynthesisUtterance(text);
-        if (chosen) { u.voice = chosen; u.lang = chosen.lang; }
-        u.rate = 0.92;  // a touch slower, like talking to a toddler
-        u.pitch = 1.12; // warm, not squeaky
+        if (v) u.voice = v;
+        u.lang = langCode;
+        u.rate = rate;   // a touch slower, like talking to a toddler
+        u.pitch = pitch; // warm, not squeaky
         u.volume = 1;
         if (onEnd) {
           let done = false;
@@ -612,6 +692,9 @@
     }
     return {
       say,
+      sayLang,
+      // For the parent settings: which voice will speak this language (null = none on this device).
+      describe(lang) { const r = resolve(lang); return r ? { name: r.v.name, lang: r.lang } : null; },
       stop() { try { if (synth) synth.cancel(); } catch (e) { /* ignore */ } },
       warmup() { say(' '); },
     };
@@ -1101,7 +1184,8 @@
       const wait = Math.max(200, 850 - (performance.now() - shownAt));
       clapTimers.push(setTimeout(startClapping, wait));
     };
-    const speaking = voice.say(opts.say || phrase + ' ' + line('cheer'), afterVoice);
+    const cheerText = opts.say || phrase + ' ' + line('cheer');
+    const speaking = opts.lang ? voice.sayLang(cheerText, opts.lang, afterVoice) : voice.say(cheerText, afterVoice);
     // Safety net: if the voice is off, or never says it has finished, clap anyway.
     clapTimers.push(setTimeout(startClapping, speaking ? 6000 : 850));
   }
@@ -1118,7 +1202,8 @@
       girl.classList.remove('dancing');
       celebrateEl.querySelectorAll('.balloon').forEach((b) => b.remove());
       if (!started) return;
-      if (mode === 'balloons') balloonGame.resume();
+      if (games[mode]) { if (games[mode].afterCelebration) games[mode].afterCelebration(); }
+      else if (mode === 'balloons') balloonGame.resume();
       else newLevel();
     }, 500);
   }
@@ -1332,20 +1417,16 @@
     };
   })();
 
-  // ---------- Mute ----------
-  function renderMute() { muteBtn.textContent = audio.isMuted() ? '🔇' : '🔊'; }
-  muteBtn.addEventListener('click', () => {
-    audio.unlock();
-    audio.setMuted(!audio.isMuted());
-    if (audio.isMuted()) voice.stop();
-    renderMute();
-  });
-  renderMute();
 
   // ---------- Start screen ----------
-  $('#title').innerHTML = 'Shape Friends'.split('').map((ch, i) =>
-    `<span style="color:${COLORS[i % COLORS.length].c};animation-delay:${(i * 0.08).toFixed(2)}s">${ch === ' ' ? '&nbsp;' : ch}</span>`
-  ).join('');
+  // Each word stays in one piece, so on a phone it wraps as "My Little / World", never mid-word.
+  let ti = 0;
+  $('#title').innerHTML = 'YugaVerse Kids'.split(' ').map((word) =>
+    '<span class="tWord">' + word.split('').map((ch) => {
+      const i = ti++;
+      return `<span style="color:${COLORS[i % COLORS.length].c};animation-delay:${(i * 0.08).toFixed(2)}s">${ch}</span>`;
+    }).join('') + '</span>'
+  ).join(' ');
   const floaters = [
     [8, 10], [78, 8], [6, 70], [80, 68], [44, 84], [45, 2],
   ];
@@ -1369,7 +1450,30 @@
     artAt(letterSVG(LETTERS[1], COLORS[5]), 50, 10, 46) +
     artAt(letterSVG(LETTERS[2], COLORS[3]), 26, 48, 48) + '</div>';
 
-  let started = false, mode = null; // mode: 'shapes', 'balloons' or 'letters'
+  // Games that live in their own files register here: each gets a full-screen layer and a menu card.
+  const games = {};
+  function registerGame(id, game) {
+    const layer = document.createElement('div');
+    layer.className = 'gameLayer';
+    layer.id = 'layer-' + id;
+    document.body.insertBefore(layer, $('#topbar'));
+    const card = document.createElement('button');
+    card.className = 'gameCard';
+    card.dataset.game = id;
+    card.setAttribute('aria-label', game.label);
+    card.style.background = game.cardBg;
+    card.innerHTML = '<div class="art">' + game.cardArt(artAt) + '</div>';
+    card.addEventListener('pointerup', () => startGame(id));
+    $('#menu').appendChild(card);
+    games[id] = Object.assign(game, { layer });
+    if (game.init) game.init(layer);
+  }
+
+  // Android's back gesture / button must not throw a toddler out of a game.
+  function guardBack() { try { history.pushState({ mlw: Date.now() }, ''); } catch (e) { /* ignore */ } }
+  window.addEventListener('popstate', () => { if (started) guardBack(); });
+
+  let started = false, mode = null; // mode: 'shapes', 'balloons', 'letters' or a registered game
   function startGame(which) {
     if (started) return;
     started = true;
@@ -1385,7 +1489,12 @@
     document.body.classList.toggle('mode-balloons', which === 'balloons');
     startEl.classList.add('gone');
     setTimeout(() => { if (started) startEl.style.display = 'none'; }, 550);
-    if (which === 'balloons') balloonGame.start();
+    guardBack();
+    if (games[which]) {
+      document.body.classList.add('mode-custom');
+      games[which].layer.classList.add('active');
+      games[which].start();
+    } else if (which === 'balloons') balloonGame.start();
     else if (which === 'letters') { updateLetters(false); newLevel(); }
     else { updateStars(false); newLevel(); }
   }
@@ -1396,6 +1505,11 @@
   function goHome() {
     if (!started) return;
     started = false;
+    if (games[mode]) {
+      games[mode].stop();
+      games[mode].layer.classList.remove('active');
+      document.body.classList.remove('mode-custom');
+    }
     mode = null;
     clapTimers.forEach((t) => { clearTimeout(t); clearInterval(t); });
     clapTimers = [];
@@ -1432,6 +1546,66 @@
     homeBtn.classList.remove('holding');
   }));
 
+  // ---------- Parent settings ----------
+  // Opened by HOLDING the gear on the start screen for 2 seconds (little ones tap, grown-ups hold).
+  const setEl = $('#settings');
+  const LANG_NAMES = { en: 'English', hi: 'Hindi', mr: 'Marathi' };
+  const SAMPLE_WORD = { en: 'Hello!', hi: 'नमस्ते!', mr: 'नमस्कार!' };
+  function renderSettings() {
+    setEl.querySelectorAll('[data-lang]').forEach((b) => b.classList.toggle('on', b.dataset.lang === settings.lang));
+    $('#setSound').classList.toggle('on', !audio.isMuted());
+    $('#setSound').textContent = audio.isMuted() ? 'Off' : 'On';
+    $('#setVoice').classList.toggle('on', settings.voiceOn);
+    $('#setVoice').textContent = settings.voiceOn ? 'On' : 'Off';
+    const l = settings.lang, d = voice.describe(l);
+    let note;
+    if (!d) note = `No ${LANG_NAMES[l]} voice on this device. Names are shown on screen, and animal sounds still play.`;
+    else if (d.lang !== l) note = `No ${LANG_NAMES[l]} voice on this device, so a ${LANG_NAMES[d.lang]} voice (${d.name}) reads the ${LANG_NAMES[l]} words.`;
+    else note = `Voice: ${d.name}.`;
+    $('#voiceInfo').textContent = note + (l !== 'en' ? ' Language applies to Animal Sounds; the older games speak English for now.' : '');
+  }
+  function openSettings() { renderSettings(); setEl.classList.remove('hidden'); }
+  function closeSettings() { setEl.classList.add('hidden'); resetArmed = false; $('#setReset').textContent = 'Reset stars & letters'; }
+  setEl.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => {
+    audio.unlock();
+    settings.set('lang', b.dataset.lang);
+    renderSettings();
+    voice.sayLang(SAMPLE_WORD[b.dataset.lang], b.dataset.lang); // let the parent hear it
+  }));
+  $('#setSound').addEventListener('click', () => {
+    audio.unlock();
+    audio.setMuted(!audio.isMuted());
+    if (audio.isMuted()) voice.stop();
+    renderSettings();
+  });
+  $('#setVoice').addEventListener('click', () => {
+    settings.set('voice', !settings.voiceOn);
+    if (!settings.voiceOn) voice.stop();
+    renderSettings();
+  });
+  let resetArmed = false;
+  $('#setReset').addEventListener('click', () => {
+    if (!resetArmed) { resetArmed = true; $('#setReset').textContent = 'Tap again to reset'; return; }
+    level = 1; letterIdx = 0;
+    store.set('sf_level', 1); store.set('sf_letter_idx', 0);
+    resetArmed = false;
+    $('#setReset').textContent = 'Done ✓';
+  });
+  $('#setClose').addEventListener('click', closeSettings);
+  const parentBtn = $('#parentBtn');
+  let parentTimer = null;
+  parentBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    parentBtn.classList.add('holding');
+    parentTimer = setTimeout(() => { parentBtn.classList.remove('holding'); openSettings(); }, 2000);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => parentBtn.addEventListener(ev, (e) => {
+    e.stopPropagation();
+    clearTimeout(parentTimer);
+    parentBtn.classList.remove('holding');
+  }));
+
   // ---------- iPad / browser guards ----------
   ['gesturestart', 'gesturechange', 'dblclick', 'contextmenu'].forEach((ev) =>
     document.addEventListener(ev, (e) => e.preventDefault()));
@@ -1452,6 +1626,7 @@
     if (p) {
       audio.sleep();
       voice.stop();
+      if (started && games[mode] && games[mode].pause) games[mode].pause();
       stopHint();
       clearTimeout(idleTimer);
       if (celebrateEl.classList.contains('show')) {
@@ -1463,6 +1638,7 @@
     } else {
       audio.wake();
       balloonGame.wake();
+      if (started && games[mode] && games[mode].resume) games[mode].resume();
       if (celebrationCut) { celebrationCut = false; endCelebrate(); }
       else if (pendingCelebration) { const o = pendingCelebration; pendingCelebration = null; celebrate(o); }
       else if (started && (mode === 'shapes' || mode === 'letters') && !busy) resetIdle();
@@ -1514,4 +1690,11 @@
   }
 
   $('#version').textContent = '© 2026 mayurj476 · v' + APP_VERSION;
+
+  window.MLW = {
+    audio, voice, fx, store, settings, COLORS, rand, pick, clamp, shuffle,
+    isPaused: () => appPaused,
+    registerGame,
+    celebrate, // the clapping cat, or the dancing girl with { character: 'girl' }
+  };
 })();

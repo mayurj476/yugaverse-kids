@@ -30,3 +30,14 @@ host). They do not work when index.html is double-clicked.
 
 Ideas: record your own voice or claps on your phone, or download free
 sound effects. Check each site's licence first.
+
+ANIMAL SOUNDS game
+------------------
+Put real animal recordings in the  sounds/animals/  folder, named:
+
+  cow  dog  cat  duck  sheep  lion  elephant  pig
+
+(for example sounds/animals/cow.mp3). Any file found replaces the built-in
+sound for that animal. Silence at the start is skipped automatically, all
+animals are evened out to a similar loudness, and long files are trimmed
+with a soft fade (pig 2.5s, lion 2.8s, elephant 3.2s, others 3.5s).

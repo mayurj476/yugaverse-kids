@@ -1,8 +1,8 @@
-# Shape Friends 🟡🟦🔺
+# YugaVerse Kids 🐮🎈🔤
 
-Three colourful games for children under 3: **shapes**, **balloons** and **ABC**. They are made for small fingers that don't tap accurately yet.
+Five gentle, colourful games for children around 2 years old: **shapes**, **balloons**, **ABC**, **animal sounds** and **colour pop**. They are made for small fingers that don't tap accurately yet. The animal and colour games speak **English, Hindi or Marathi**.
 
-### ▶ Play: **https://mayurj476.github.io/shape-friends/**
+### ▶ Play: **https://mayurj476.github.io/yugaverse-kids/**
 
 It works in any modern browser, and installs like an app on Android, iPad and iPhone. After the first visit it also works with no internet.
 
@@ -18,7 +18,7 @@ Once installed, it opens full screen from its own icon, with no browser bars.
 
 ## The games
 
-The start screen has three big picture cards, so a child who can't read can still choose.
+The start screen has big picture cards, so a child who can't read can still choose.
 
 ### 🟡 Shapes
 - Each level shows **3 random shapes** with smiling faces. There are 9 shapes in all, including circle, star, heart and moon.
@@ -39,6 +39,23 @@ The start screen has three big picture cards, so a child who can't read can stil
 - After both letters are in, a **girl dances** to a bouncy song. Tapping her makes her laugh.
 - The top bar shows how far the child has got (⭐ A–D).
 
+### 🐮 Animal Sounds
+- Eight soft cartoon animals on big cards: cow, dog, cat, duck, sheep, lion, elephant and pig.
+- Tapping an animal makes its card bounce. The voice says the animal's name, then the animal makes its real sound.
+- There is nothing to get wrong. Every tap is a good tap.
+
+### 🥚 Color Pop
+- One big glossy **egg or ball** at a time, in a random colour. It bounces in, and the voice says its colour once ("Red!", "लाल!").
+- One tap and it cracks and bursts into confetti of its colour. An egg's shell splits in two.
+- After **3 bursts** the dancing girl comes out to celebrate, then it starts again.
+
+## Parent settings
+**Hold** the ⚙️ on the start screen for 2 seconds. A quick tap does nothing, so a toddler can't open it.
+- **Language:** English, हिन्दी (Hindi) or मराठी (Marathi). This is used by Animal Sounds and Color Pop. The older games speak English for now.
+- **Sounds** and **voice** can be switched on or off.
+- **Reset** stars and letters.
+- Settings say which voice your device will use. Many devices have no Marathi voice; then a Hindi voice reads the Marathi words. If there is no Hindi voice either, names are still shown on screen and the sounds still play.
+
 ## Made for little hands
 - **Forgiving touch:** a tap *near* a shape, letter or balloon counts, even if it misses. Shapes and letters also snap in on their own once they get close to their outline. Several fingers at once work fine.
 - **Every touch gets an answer:** tapping an empty spot makes a soft bloop and a few sparkles.
@@ -46,14 +63,14 @@ The start screen has three big picture cards, so a child who can't read can stil
 - **Wrong drops are friendly:** the piece slides back with an "Oops! Try again", never a buzzer.
 - **A natural voice:** the game picks the most natural-sounding voice on the device, and its lines change so it doesn't repeat itself. The voice always finishes before the cat claps or the girl dances.
 - **Pauses by itself:** when the app is minimized, the screen locks, or another window is in front, everything stops (sound, voice, moving balloons). It carries on when the child comes back.
-- **No accidental exits:** going back to the menu means **holding** 🏠 for about a second. A quick tap does nothing.
-- **Sound on or off:** 🔊 / 🔇 is at the top right.
+- **No accidental exits:** going back to the menu means **holding** 🏠 for about a second. A quick tap does nothing, and the Android back gesture can't close a game.
 - **No ads, no accounts, no tracking.** Progress (stars and letters) is saved on the device only.
 
 ## Tips for parents
-- **Better voice on iPad / iPhone:** go to Settings → Accessibility → Spoken Content → Voices → English, and download a voice marked **Enhanced** or **Premium**, such as *Ava (Premium)*. The game uses it automatically.
+- **Better voice on iPad / iPhone:** go to Settings → Accessibility → Spoken Content → Voices, and download a voice marked **Enhanced** or **Premium** for English (such as *Ava (Premium)*) or Hindi. The game uses it automatically.
+- **Hindi and Marathi on Android:** install the Hindi and Marathi voice data in Settings → *Text-to-speech output* (Google's speech engine).
 - **Keep them in the game:** on iPad use *Guided Access* (Settings → Accessibility). On Android use *App pinning* (search for "pinning" in Settings).
-- **Start over:** to reset the stars and letters, clear the site's data in the browser settings.
+- **Start over:** use **Reset** in the parent settings.
 
 ## Running it on your own computer
 This section is for the owner and for anyone with permission (see [Licence](#licence)).
@@ -62,15 +79,16 @@ This section is for the owner and for anyone with permission (see [Licence](#lic
 - **On a tablet over home Wi-Fi:** double-click `run.bat`. It needs [Node.js](https://nodejs.org). A popup shows the address to type on the tablet, such as `http://192.168.1.14:3000`. Keep the black window open while playing. The first time, click **Allow** if Windows asks about the firewall. While it runs, the tablet reloads by itself whenever a file changes.
 
 ### Your own sounds
-Every sound is made by the game itself, but recordings can replace them. Put `.mp3`, `.wav` or `.m4a` files in `sounds/` with names such as `clap`, `applause`, `crackle`, `laugh`, `meow` or `dance`. [sounds/README.txt](sounds/README.txt) lists every name. Long recordings are trimmed with a soft fade, so they never pile up.
+The game can make every sound by itself, but recordings replace them. Put `.mp3`, `.wav` or `.m4a` files in `sounds/`, with names such as `clap`, `applause`, `crackle`, `laugh`, `meow` or `dance`. Animal recordings go in `sounds/animals/`, named `cow`, `dog`, `cat`, `duck`, `sheep`, `lion`, `elephant` and `pig`. [sounds/README.txt](sounds/README.txt) lists every name. Silence at the start is skipped, loudness is evened out, and long recordings are trimmed with a soft fade.
 
 ## Files
 | File | What it is |
 |---|---|
-| `index.html` | The page, including the cat and the dancing girl drawings |
+| `index.html` | The page, including the cat, the dancing girl and the parent settings |
 | `style.css` | Colours, scenery and all animations |
-| `app.js` | All three games: touch handling, sounds, voice, confetti |
-| `sounds/` | Optional recorded sounds, plus a guide to the file names |
+| `app.js` | The core: Shapes, Balloons and ABC, touch handling, sounds, voices, settings, confetti |
+| `games/animals.js`, `games/colors.js` | Animal Sounds and Color Pop |
+| `sounds/` | Recorded sounds (including `sounds/animals/`), plus a guide to the file names |
 | `icons/`, `manifest.webmanifest`, `sw.js` | App icon, "install as app" and offline support |
 | `run.bat`, `server.js` | Local server for playing on a tablet over home Wi-Fi |
 | `LICENSE` | Licence terms |

@@ -1,15 +1,15 @@
-Shape Friends - Proprietary Licence (All Rights Reserved)
+YugaVerse Kids - Proprietary Licence (All Rights Reserved)
 
 Copyright (c) 2026 mayurj476. All rights reserved.
 
 This software is protected by copyright law. "The Software" means its source
-code, graphics, characters (the Shape Friends shapes, the cat and the dancing
+code, graphics, characters (the YugaVerse Kids shapes, animals, the cat and the dancing
 girl), animations, built-in synthesized sounds, game design and text.
 
 1. WHAT YOU MAY DO
    - View the source code on GitHub.
    - Play the game at its official address,
-     https://mayurj476.github.io/shape-friends/ , for personal,
+     https://mayurj476.github.io/yugaverse-kids/ , for personal,
      non-commercial use, including installing it to a home screen from
      that address.
 
@@ -34,8 +34,9 @@ girl), animations, built-in synthesized sounds, game design and text.
 4. THIRD-PARTY MATERIAL (NOT COVERED BY THIS LICENCE)
    These items do not belong to the copyright holder. They stay under their
    own owners' licences:
-   - sounds/crackle.mp3, sounds/laugh.mp3 and sounds/applause.wav:
-     third-party sound recordings, each under its original licence.
+   - Every sound recording in the sounds/ folder, including
+     sounds/animals/: third-party recordings, each under its original
+     licence.
    - The "Baloo 2" font, loaded from Google Fonts (SIL Open Font License).
    - Emoji pictures, which are drawn by the viewer's own device emoji font.
 

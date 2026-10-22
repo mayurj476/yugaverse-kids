@@ -1,12 +1,14 @@
-// Shape Friends - Copyright (c) 2026 mayurj476. All rights reserved.
+// YugaVerse Kids - Copyright (c) 2026 mayurj476. All rights reserved.
 // Not for copying, reuse or redistribution without written permission. See LICENSE.
 // Offline support: the game keeps working with no internet after the first visit.
-const CACHE = 'shape-friends-v3';
+const CACHE = 'yugaverse-kids-v6';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
+  './games/animals.js',
+  './games/colors.js',
   './manifest.webmanifest',
   './icons/icon.svg',
   './icons/icon-180.png',

@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Shape Friends - Copyright (c) 2026 mayurj476. All rights reserved. See LICENSE. -->
+<!-- YugaVerse Kids - Copyright (c) 2026 mayurj476. All rights reserved. See LICENSE. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -7,11 +7,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Shape Friends">
+  <meta name="apple-mobile-web-app-title" content="YugaVerse Kids">
   <meta name="theme-color" content="#6ccfff">
   <meta name="author" content="mayurj476">
   <meta name="copyright" content="Copyright (c) 2026 mayurj476. All rights reserved.">
-  <title>Shape Friends</title>
+  <title>YugaVerse Kids</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
@@ -44,7 +44,6 @@
     <div id="stars"></div>
     <div class="topBtns">
       <button id="homeBtn" aria-label="Back to the menu (hold)">🏠</button>
-      <button id="muteBtn" aria-label="Sound on or off">🔊</button>
     </div>
   </div>
 
@@ -165,6 +164,7 @@
     <div id="startShapes" aria-hidden="true"></div>
     <h1 id="title"></h1>
     <div id="version"></div>
+    <button id="parentBtn" aria-label="Parent settings (hold for 2 seconds)">⚙️</button>
     <div id="menu">
       <button class="gameCard" id="cardShapes" data-game="shapes" aria-label="Shape game"></button>
       <button class="gameCard" id="cardBalloons" data-game="balloons" aria-label="Balloon game"></button>
@@ -172,6 +172,29 @@
     </div>
   </div>
 
+  <!-- Parent settings: opened by holding the gear on the start screen -->
+  <div id="settings" class="hidden" role="dialog" aria-label="Parent settings">
+    <div class="setCard">
+      <button id="setClose" aria-label="Close settings">✕</button>
+      <h2>Parent settings</h2>
+      <div class="setRow">
+        <div class="setLabel">Language</div>
+        <div class="langBtns">
+          <button data-lang="en">English</button>
+          <button data-lang="hi">हिन्दी</button>
+          <button data-lang="mr">मराठी</button>
+        </div>
+      </div>
+      <p id="voiceInfo" class="setNote"></p>
+      <div class="setRow"><div class="setLabel">Sounds</div><button class="toggle" id="setSound"></button></div>
+      <div class="setRow"><div class="setLabel">Voice</div><button class="toggle" id="setVoice"></button></div>
+      <div class="setRow"><div class="setLabel">Progress</div><button id="setReset">Reset stars &amp; letters</button></div>
+      <p class="setNote">No ads, no accounts, nothing uploaded. Settings and progress stay on this device.</p>
+    </div>
+  </div>
+
   <script src="app.js"></script>
+  <script src="games/animals.js"></script>
+  <script src="games/colors.js"></script>
 </body>
 </html>
