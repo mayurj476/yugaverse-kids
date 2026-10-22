@@ -53,6 +53,13 @@ For offline play anywhere, host the folder on a free static host (GitHub Pages, 
 
 **Tip for parents:** turn on iPad *Guided Access* (Settings → Accessibility) to keep a toddler inside the game.
 
+## Licence
+**Copyright © 2026 mayurj476. All rights reserved.**
+
+This is not open source. You may view the code and play the game at its official address for personal use. Copying, changing, re-hosting, making apps from it or any commercial use needs **written permission from the owner**, and permission may involve a fee. See [LICENSE](LICENSE) for the full terms, and contact [mayurj476 on GitHub](https://github.com/mayurj476) to ask.
+
+The sound recordings in `sounds/` and the Baloo 2 font belong to their own owners and are not covered by this licence.
+
 ## Files
 | File | What it is |
 |---|---|

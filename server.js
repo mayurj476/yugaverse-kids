@@ -1,3 +1,5 @@
+// Shape Friends - Copyright (c) 2026 mayurj476. All rights reserved.
+// Not for copying, reuse or redistribution without written permission. See LICENSE.
 // Serves the game on your home network and shows the address to type on the iPad.
 // Usage: node server.js   (or double-click run.bat)
 const http = require('http');
