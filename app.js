@@ -3,7 +3,7 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = '14'; // shown in the corner of the start screen
+  const APP_VERSION = '16'; // shown in the corner of the start screen
   let updateReady = false;
   let appPaused = false; // true while the app is minimized, hidden or not in focus
 

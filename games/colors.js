@@ -3,10 +3,11 @@
 
 // ---------- Game: Color Pop ----------
 // One big glossy egg or ball at a time. It bounces in and the voice says its colour once.
-// One tap and it cracks and bursts. After 3 bursts, the dancing girl celebrates.
+// First tap cracks it, second tap bursts it into a big paint splat that stays on the screen.
+// After 3 bursts, the dancing girl celebrates, then the splats fade away.
 (() => {
   'use strict';
-  const { audio, voice, fx, pick, clamp, settings } = window.MLW;
+  const { audio, voice, fx, pick, clamp, shuffle, settings } = window.MLW;
 
   const COLORS = [
     { id: 'red',    names: { en: 'Red',    hi: 'लाल',    mr: 'लाल' },    light: '#ff9a9a', mid: '#ff3b3b', dark: '#b31212' },
@@ -72,10 +73,57 @@
   const ZIG = '120,64 108,72 96,60 84,72 72,60 60,72 48,60 36,72 24,60 12,72 0,64';
   const TOP_HALF = '0,0 120,0 ' + ZIG;
   const BOTTOM_HALF = ZIG + ' 0,126 120,126';
+  // Crack lines drawn over the object after the first tap.
+  const CRACKS = {
+    egg: ['M60 18 L53 34 L64 44 L55 60 L66 72', 'M64 44 L78 50', 'M55 60 L42 66'],
+    ball: ['M58 22 L51 40 L63 50 L54 66 L64 80', 'M63 50 L80 56', 'M54 66 L40 70'],
+  };
+  function crackSVG(kind, c) {
+    return `<svg class="cpCrack" viewBox="0 0 120 126" aria-hidden="true">${CRACKS[kind].map((d, i) =>
+      `<path d="${d}" pathLength="1" style="animation-delay:${i * 0.06}s" fill="none" stroke="${c.dark}" stroke-width="${i ? 2.6 : 3.4}" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`;
+  }
+
+  // ---------- Paint splat ----------
+  // A wobbly blob with splash spikes, flung droplets and a few drips running down.
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function blobPath(cx, cy, R, n) {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + rnd(-0.08, 0.08);
+      const r = R * (Math.random() < 0.25 ? rnd(1.2, 1.45) : rnd(0.86, 1.02));
+      pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+    }
+    // Smooth closed curve through the midpoints.
+    const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    let d = `M${mid(pts[n - 1], pts[0]).map((v) => v.toFixed(1)).join(' ')}`;
+    pts.forEach((p, i) => { const m = mid(p, pts[(i + 1) % n]); d += ` Q${p[0].toFixed(1)} ${p[1].toFixed(1)} ${m[0].toFixed(1)} ${m[1].toFixed(1)}`; });
+    return d + 'Z';
+  }
+  function splatSVG(c) {
+    const drops = Array.from({ length: 14 }, () => {
+      const a = rnd(0, Math.PI * 2), dist = rnd(62, 96);
+      return `<circle class="cpDrop" cx="${(100 + Math.cos(a) * dist).toFixed(1)}" cy="${(100 + Math.sin(a) * dist).toFixed(1)}" r="${rnd(3, 9).toFixed(1)}" style="--dx:${(-Math.cos(a) * 40).toFixed(0)}px;--dy:${(-Math.sin(a) * 40).toFixed(0)}px"/>`;
+    }).join('');
+    const drips = Array.from({ length: 3 }, () => {
+      const x = rnd(78, 122), w = rnd(7, 12), len = rnd(30, 62);
+      return `<g class="cpDrip" style="animation-delay:${rnd(0.3, 0.9).toFixed(2)}s"><rect x="${(x - w / 2).toFixed(1)}" y="110" width="${w.toFixed(1)}" height="${len.toFixed(1)}" rx="${(w / 2).toFixed(1)}"/><circle cx="${x.toFixed(1)}" cy="${(110 + len).toFixed(1)}" r="${(w * 0.75).toFixed(1)}"/></g>`;
+    }).join('');
+    return `<svg viewBox="0 0 200 200" aria-hidden="true" fill="${c.mid}">
+      ${drips}
+      <path d="${blobPath(100, 100, 52, 26)}"/>
+      ${drops}
+      <path d="${blobPath(92, 90, 22, 9)}" fill="${c.light}" opacity=".45"/>
+      <ellipse cx="80" cy="76" rx="9" ry="5" fill="#fff" opacity=".45" transform="rotate(-30 80 76)"/>
+    </svg>`;
+  }
 
   // ---------- The game ----------
-  let layer, stage, dotsEl, obj = null, state = 'idle', count = 0, lastColor = null;
-  let timers = [], idleTimer = null, running = false;
+  let layer, stage, splats, dotsEl, obj = null, state = 'idle', count = 0, lastColor = null;
+  let timers = [], idleTimer = null, running = false, spots = [];
+  // Each object of a round lands in its own spot, so all three splats stay visible.
+  const SPOTS = [[28, 50], [72, 56], [50, 62]];
+  const TALL_SPOTS = [[38, 32], [64, 52], [40, 72]];
+  let roundColors = [];
   const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
   const lang = () => settings.lang;
   const nameOf = (c) => c.names[lang()] || c.names.en;
@@ -89,13 +137,20 @@
   function next() {
     if (!running) return;
     let c;
-    do { c = pick(COLORS); } while (c === lastColor);
+    // A new colour each time, and no repeats within a round of three.
+    if (!spots.length) roundColors = [];
+    do { c = pick(COLORS); } while (c === lastColor || roundColors.includes(c));
     lastColor = c;
+    roundColors.push(c);
     const kind = Math.random() < 0.5 ? 'egg' : 'ball';
     const pattern = Math.floor(Math.random() * PATTERNS.length);
     const el = document.createElement('div');
     el.className = 'cpObj enter';
     el.style.setProperty('--s', size() + 'px');
+    if (!spots.length) spots = shuffle((window.innerHeight > window.innerWidth * 1.2 ? TALL_SPOTS : SPOTS).slice());
+    const [left, top] = spots.pop();
+    el.style.left = left + '%';
+    el.style.top = top + '%';
     el.innerHTML = `<div class="cpShadow"></div><div class="cpBody">${kind === 'egg' ? eggSVG(c, pattern) : ballSVG(c)}</div>`;
     stage.appendChild(el);
     obj = { el, c, kind, pattern };
@@ -115,15 +170,29 @@
     return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width / 2 };
   }
 
+  // First tap: the shell cracks and wobbles. It waits for the second tap.
+  function crack() {
+    state = 'cracking';
+    resetIdle();
+    const { el, c, kind } = obj;
+    const { x, y } = center();
+    el.classList.remove('wiggle');
+    el.classList.add('crack');
+    el.querySelector('.cpBody').insertAdjacentHTML('beforeend', crackSVG(kind, c));
+    crackSound();
+    fx.burst(x, y - 20, c.mid, 6);
+    later(() => { if (obj && obj.el === el && state === 'cracking') { el.classList.remove('crack'); el.classList.add('cracked'); state = 'cracked'; } }, 260);
+  }
+
   function burst() {
-    if (state !== 'ready' || !obj) return;
+    if (state !== 'cracked' || !obj) return;
     state = 'bursting';
     clearTimeout(idleTimer);
     voice.stop();
     const { el, c, kind, pattern } = obj;
-    const { x, y } = center();
+    const { x, y, r } = center();
+    el.classList.remove('cracked');
     el.classList.add('crack');
-    crackSound();
     later(() => {
       // Pop: shell halves fly apart (egg) or it bursts into stars (ball).
       if (kind === 'egg') {
@@ -133,11 +202,9 @@
       } else {
         el.classList.add('popped');
       }
-      const crackle = Array.from({ length: 26 }, () => 0.12 + Math.pow(Math.random(), 1.5) * 0.8);
-      audio.burst(COLORS.indexOf(c) + 2, crackle);
-      fx.firework(x, y, c.mid);
-      fx.burst(x, y, c.light, 16);
-      crackle.forEach((t) => later(() => fx.spark(x + (Math.random() * 2 - 1) * 140, y + (Math.random() * 2 - 1) * 140), t * 1000));
+      splatSound();
+      splat(x, y, r, c);
+      fx.burst(x, y, c.mid, 20);
       count++;
       renderDots(true);
     }, 230);
@@ -151,20 +218,59 @@
     }, 1300);
   }
 
-  // A crisp eggshell crack: a few sharp clicks and a little "tok" before the big pop.
+  // Paint stays where it burst, growing in from the middle. Cleared after the party.
+  function splat(x, y, r, c) {
+    const box = layer.getBoundingClientRect();
+    const s = document.createElement('div');
+    s.className = 'cpSplat';
+    s.style.cssText = `left:${x - box.left}px;top:${y - box.top}px;--s:${Math.round(r * 3.4)}px;--rot:${Math.round(rnd(-40, 40))}deg`;
+    s.innerHTML = splatSVG(c);
+    splats.appendChild(s);
+  }
+  function clearSplats() {
+    [...splats.children].forEach((s) => { s.classList.add('gone'); setTimeout(() => s.remove(), 700); });
+  }
+
+  // Soft sounds only (no firecracker crackle).
+  function tone(k, at, from, to, dur, vol, pan = 0) {
+    const t = k.ac.currentTime + at;
+    const osc = k.ac.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(from, t);
+    osc.frequency.exponentialRampToValueAtTime(to, t + dur);
+    const g = k.ac.createGain();
+    k.env(g.gain, t, vol, 0.004, dur);
+    osc.connect(g); k.out(g, 0.25, pan);
+    osc.start(t); osc.stop(t + dur * 1.5 + 0.1);
+  }
+  // First tap: a gentle wooden "tok" with a little wobble.
   function crackSound() {
     const k = audio.kit();
     if (!k) return;
-    [0, 0.035, 0.08, 0.12].forEach((t, i) => k.noise(t, { dur: 0.006 + i * 0.002, vol: 0.7, type: 'highpass', freq: 2500 + i * 600, q: 0.7, send: 0.15 }));
-    k.noise(0.02, { dur: 0.05, vol: 0.4, type: 'bandpass', freq: 900, q: 2, send: 0.1 });
+    k.noise(0, { dur: 0.04, vol: 0.45, type: 'bandpass', freq: 1100, q: 3, send: 0.1 });
+    tone(k, 0, 420, 300, 0.12, 0.22);
+    tone(k, 0.1, 340, 380, 0.16, 0.12);
+  }
+  // Second tap: a squishy paint SPLAT, then a few drips plopping up a happy scale.
+  function splatSound() {
+    const k = audio.kit();
+    if (!k) return;
+    k.noise(0, { dur: 0.16, vol: 0.85, type: 'lowpass', freq: 420, q: 0.9, send: 0.15 });
+    k.noise(0.005, { dur: 0.07, vol: 0.35, type: 'bandpass', freq: 1500, q: 1.2, send: 0.2 });
+    tone(k, 0, 520, 140, 0.18, 0.3);
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(k, 0.18 + i * 0.11 + rnd(0, 0.03), f * 0.7, f, 0.09, 0.14, rnd(-0.6, 0.6)));
   }
 
   // Forgiving touch: anywhere near the object counts. Elsewhere: a soft bloop and sparkles.
   function onDown(e) {
     if (!running) return;
-    if (state === 'ready' && obj) {
+    if ((state === 'ready' || state === 'cracking' || state === 'cracked') && obj) {
       const { x, y, r } = center();
-      if (Math.hypot(e.clientX - x, e.clientY - y) < r + 110) { e.preventDefault(); burst(); return; }
+      if (Math.hypot(e.clientX - x, e.clientY - y) < r + 110) {
+        e.preventDefault();
+        if (state === 'ready') crack(); else if (state === 'cracked') burst();
+        return;
+      }
     }
     if (state === 'party') return;
     audio.tap();
@@ -176,7 +282,7 @@
     if (running) idleTimer = setTimeout(hint, 9000);
   }
   function hint() {
-    if (!running || state !== 'ready' || !obj || window.MLW.isPaused()) return;
+    if (!running || (state !== 'ready' && state !== 'cracked') || !obj || window.MLW.isPaused()) return;
     obj.el.classList.remove('wiggle'); void obj.el.offsetWidth; obj.el.classList.add('wiggle');
     voice.sayLang(SAY.tapIt[lang()], lang());
     resetIdle();
@@ -187,6 +293,8 @@
     timers = [];
     clearTimeout(idleTimer);
     stage.innerHTML = '';
+    splats.innerHTML = '';
+    spots = [];
     obj = null;
     state = 'idle';
   }
@@ -198,9 +306,8 @@
       artAt(eggSVG(COLORS[1], 1), 6, 6, 50, 53) + artAt(ballSVG(COLORS[0]), 44, 14, 50, 53) + artAt(eggSVG(COLORS[2], 0), 24, 44, 50, 53),
     init(el) {
       layer = el;
-      layer.innerHTML = '<div class="cpDots"></div><div class="cpStage"></div>';
-      dotsEl = layer.firstElementChild;
-      stage = layer.lastElementChild;
+      layer.innerHTML = '<div class="cpSplats"></div><div class="cpDots"></div><div class="cpStage"></div>';
+      [splats, dotsEl, stage] = layer.children;
       layer.addEventListener('pointerdown', onDown);
     },
     start() {
@@ -212,9 +319,11 @@
     },
     stop() { running = false; clearAll(); },
     pause() { clearTimeout(idleTimer); },
-    resume() { if (state === 'ready') resetIdle(); },
+    resume() { if (state === 'ready' || state === 'cracked') resetIdle(); },
     afterCelebration() {
       count = 0;
+      spots = [];
+      clearSplats();
       renderDots(false);
       state = 'idle';
       later(next, 300);

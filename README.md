@@ -1,6 +1,6 @@
 # YugaVerse Kids 🐮🎈🔤
 
-Five gentle, colourful games for children around 2 years old: **shapes**, **balloons**, **ABC**, **animal sounds** and **colour pop**. They are made for small fingers that don't tap accurately yet. The animal and colour games speak **English, Hindi or Marathi**.
+Six gentle, colourful games for children around 2 years old: **shapes**, **balloons**, **ABC**, **animal sounds**, **colour pop** and **colouring**. They are made for small fingers that don't tap accurately yet. The animal, colour and colouring games speak **English, Hindi or Marathi**.
 
 ### ▶ Play: **https://mayurj476.github.io/yugaverse-kids/**
 
@@ -46,12 +46,19 @@ The start screen has big picture cards, so a child who can't read can still choo
 
 ### 🥚 Color Pop
 - One big glossy **egg or ball** at a time, in a random colour. It bounces in, and the voice says its colour once ("Red!", "लाल!").
-- One tap and it cracks and bursts into confetti of its colour. An egg's shell splits in two.
+- The first tap cracks it with a soft "tok". The second tap bursts it with a squishy splat. There's no firecracker sound.
+- The paint splashes across the screen in its colour and drips. Each of the 3 lands in its own spot and stays until the party.
 - After **3 bursts** the dancing girl comes out to celebrate, then it starts again.
+
+### 🖌️ Coloring
+- One big outline picture at a time, with a smiling face on most of them. There are 12: apple, fish, star, house, butterfly, cat, car, flower, sun, ice cream, duck and turtle. Each has 1 to 3 big parts to colour.
+- **Six round paint bowls** are on the right: red, yellow, blue, green, orange and pink. Tapping a bowl dips the brush in it, and the voice says the colour.
+- Tapping a part of the picture pours the paint in from the finger. Any colour is fine, and a part can be painted again in a new colour. Taps just next to a part still count.
+- When every part is coloured, the picture jumps for joy and the **clapping cat** celebrates. Then a new picture comes.
 
 ## Parent settings
 **Hold** the ⚙️ on the start screen for 2 seconds. A quick tap does nothing, so a toddler can't open it.
-- **Language:** English, हिन्दी (Hindi) or मराठी (Marathi). This is used by Animal Sounds and Color Pop. The older games speak English for now.
+- **Language:** English, हिन्दी (Hindi) or मराठी (Marathi). This is used by Animal Sounds, Color Pop and Coloring. The older games speak English for now.
 - **Sounds** and **voice** can be switched on or off.
 - **Reset** stars and letters.
 - Settings say which voice your device will use. Many devices have no Marathi voice; then a Hindi voice reads the Marathi words. If there is no Hindi voice either, names are still shown on screen and the sounds still play.
@@ -87,7 +94,7 @@ The game can make every sound by itself, but recordings replace them. Put `.mp3`
 | `index.html` | The page, including the cat, the dancing girl and the parent settings |
 | `style.css` | Colours, scenery and all animations |
 | `app.js` | The core: Shapes, Balloons and ABC, touch handling, sounds, voices, settings, confetti |
-| `games/animals.js`, `games/colors.js` | Animal Sounds and Color Pop |
+| `games/animals.js`, `games/colors.js`, `games/coloring.js` | Animal Sounds, Color Pop and Coloring |
 | `sounds/` | Recorded sounds (including `sounds/animals/`), plus a guide to the file names |
 | `icons/`, `manifest.webmanifest`, `sw.js` | App icon, "install as app" and offline support |
 | `run.bat`, `server.js` | Local server for playing on a tablet over home Wi-Fi |
