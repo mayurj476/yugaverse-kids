@@ -700,3 +700,78 @@ body.mode-custom #board { display: none; }
 .clBrush svg { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .2)); }
 .clBrush.dip { animation: clBrushDip .45s ease; }
 @keyframes clBrushDip { 45% { transform: rotate(18deg) translateY(22%); } }
+
+/* ---------- Talking Cat ---------- */
+.tcWrap { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); }
+.tcCat svg { width: 100%; height: auto; display: block; overflow: visible; }
+.tcCat .tcHead, .tcCat .tcBody, .tcCat .tcTail, .tcCat .tcEar, .tcCat .tcEyes, .tcCat .tcMouthOpen { transform-box: fill-box; }
+.tcHead { transform-origin: 50% 90%; transition: transform .3s ease; }
+.tcTail { transform-origin: 0% 100%; animation: tcTail 2.4s ease-in-out infinite; }
+.tcBody { transform-origin: 50% 100%; animation: tcBreathe 3s ease-in-out infinite; }
+.tcEar { transform-origin: 50% 100%; transition: transform .25s ease; }
+.tcEyes { transform-origin: center; transition: transform .08s; }
+.tcMouthOpen { transform-origin: 50% 0%; opacity: 0; }
+.tcCat.blink .tcEyes { transform: scaleY(.1); }
+.tcCat.enter { animation: tcEnter .9s cubic-bezier(.34, 1.56, .64, 1) both; }
+.tcCat.listening .tcHead { transform: rotate(-8deg); }
+.tcCat.listening .tcEar { transform: scale(1.12); }
+.tcCat.talking .tcHead { animation: tcNod .5s ease-in-out infinite; }
+.tcCat.running .tcTail { animation-duration: .35s; }
+.tcCat.giggle { animation: tcGiggle .18s ease-in-out 10; }
+.tcCat.giggle .tcEyes { transform: scaleY(.35); }
+.tcCat.jump { animation: tcJump 1.05s cubic-bezier(.3, .7, .4, 1) both; }
+.tcCat.wave .tcHead { animation: tcWave 1.2s ease; }
+@keyframes tcEnter { from { transform: translateY(60%) scale(.5); opacity: 0; } }
+@keyframes tcTail { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(10deg); } }
+@keyframes tcBreathe { 50% { transform: scale(1.015, .99); } }
+@keyframes tcNod { 50% { transform: rotate(3deg) translateY(-1%); } }
+@keyframes tcGiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) scale(1.02); } }
+@keyframes tcJump {
+  0% { transform: none; } 15% { transform: scale(1.1, .85); }
+  50% { transform: translateY(-45%) rotate(180deg); } 85% { transform: translateY(0) rotate(360deg) scale(1.08, .9); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes tcWave { 25% { transform: rotate(-10deg); } 60% { transform: rotate(8deg); } }
+/* silly faces and moves */
+.tcCat .tcEye, .tcCat .tcPupil, .tcCat .tcMuzzle, .tcCat .tcTongue, .tcCat .tcArm { transform-box: fill-box; }
+.tcEye, .tcMuzzle { transform-origin: center; transition: transform .2s cubic-bezier(.34, 1.56, .64, 1); }
+.tcPupil { transition: transform .2s ease; }
+.tcTongue { transform-origin: 50% 0%; opacity: 0; }
+.tcLid { opacity: 0; }
+.tcArm { transform-origin: 15% 95%; opacity: 0; }
+.tcPawR { transition: opacity .1s; }
+.tcCat.tongue .tcTongue { opacity: 1; animation: tcBlep .35s ease-in-out 4 alternate; }
+.tcCat.wink .tcEye.r .tcOpen { opacity: 0; }
+.tcCat.wink .tcEye.r .tcLid { opacity: 1; }
+.tcCat.wink .tcHead { transform: rotate(5deg); }
+.tcCat.cross .tcEye.l .tcPupil { transform: translate(8px, 4px); }
+.tcCat.cross .tcEye.r .tcPupil { transform: translate(-8px, 4px); }
+.tcCat.cross .tcHead { animation: tcGiggle .5s ease-in-out 3; }
+.tcCat.surprised .tcEye { transform: scale(1.22); }
+.tcCat.surprised .tcEar { transform: scale(1.15); }
+.tcCat.puff .tcMuzzle { transform: scale(1.35); }
+.tcCat.puff .tcEye { transform: scaleY(.55); }
+.tcCat.wave .tcArm, .tcCat.dance .tcArm { opacity: 1; animation: tcWaveArm .32s ease-in-out infinite alternate; }
+.tcCat.wave .tcPawR, .tcCat.dance .tcPawR { opacity: 0; }
+.tcCat.dance { animation: tcDance .6s ease-in-out 4; }
+.tcCat.dance .tcTail { animation-duration: .6s; }
+@keyframes tcBlep { from { transform: scaleY(.5); } to { transform: scaleY(1.1); } }
+@keyframes tcWaveArm { from { transform: rotate(-14deg); } to { transform: rotate(16deg); } }
+@keyframes tcDance {
+  0%, 100% { transform: rotate(-7deg); }
+  25% { transform: translateY(-7%) rotate(0deg) scale(1.03, .97); }
+  50% { transform: rotate(7deg); }
+  75% { transform: translateY(-7%) rotate(0deg) scale(1.03, .97); }
+}
+.tcNote { position: absolute; font-size: 44px; font-weight: 700; pointer-events: none; animation: tcNote 1.6s ease-out forwards; text-shadow: 0 2px 0 #fff; }
+@keyframes tcNote { from { transform: translateY(0) scale(.6); opacity: 0; } 20% { opacity: 1; } to { transform: translate(20px, -140px) rotate(15deg) scale(1.1); opacity: 0; } }
+.tcMic {
+  position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 18px); transform: translateX(-50%);
+  width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-size: 26px;
+  background: rgba(255, 255, 255, .7); pointer-events: none; transition: opacity .3s;
+}
+.tcMic.on { box-shadow: 0 0 0 0 rgba(46, 204, 64, .6); animation: tcMicPulse 1.8s ease-out infinite; }
+.tcMic.off, .tcMic.asking { opacity: .45; }
+.tcMic.none { opacity: .35; filter: grayscale(1); }
+.tcMic.none::after { content: ''; position: absolute; width: 60%; height: 4px; border-radius: 2px; background: #e33; transform: rotate(-45deg); }
+@keyframes tcMicPulse { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 64, .55); } 100% { box-shadow: 0 0 0 18px rgba(46, 204, 64, 0); } }

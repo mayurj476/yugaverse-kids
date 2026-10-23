@@ -1,6 +1,6 @@
 # YugaVerse Kids 🐮🎈🔤
 
-Six gentle, colourful games for children around 2 years old: **shapes**, **balloons**, **ABC**, **animal sounds**, **colour pop** and **colouring**. They are made for small fingers that don't tap accurately yet. The animal, colour and colouring games speak **English, Hindi or Marathi**.
+Seven gentle, colourful games for children around 2 years old: **shapes**, **balloons**, **ABC**, **animal sounds**, **colour pop**, **colouring** and a **talking cat**. They are made for small fingers that don't tap accurately yet. The animal, colour and colouring games speak **English, Hindi or Marathi**.
 
 ### ▶ Play: **https://mayurj476.github.io/yugaverse-kids/**
 
@@ -56,9 +56,17 @@ The start screen has big picture cards, so a child who can't read can still choo
 - Tapping a part of the picture pours the paint in from the finger. Any colour is fine, and a part can be painted again in a new colour. Taps just next to a part still count.
 - When every part is coloured, the picture jumps for joy and the **clapping cat** celebrates. Then a new picture comes.
 
+### 🐱 Talking Cat
+- A big cartoon cat sits on the grass. When the child talks, it tilts its head to listen, then **repeats what they said in a funny squeaky voice**, moving its mouth to the sound.
+- **Tapping its head** makes it run across the screen and back with a real meow. **Tickling its belly** makes it giggle, and **tapping its tail** makes it jump and spin.
+- Every few seconds it does something silly by itself, in random order: sticks its tongue out, winks, goes cross-eyed, puffs its cheeks, looks surprised, waves "Hi!" or dances with music notes. Now and then it invites the child to talk to it or tap it.
+- **Microphone and privacy:** the browser asks once for microphone permission. The child's voice is only kept in the device's memory for a few seconds so it can be played back. It is never saved or uploaded. The microphone switches off as soon as the child leaves the game, or the app is minimised. The 🎤 at the top glows green while the cat is listening.
+- Without a microphone (permission refused, or no mic), the cat still reacts to taps and does its silly faces.
+- The microphone only works over **https** (the Play link) or on the computer running `run.bat`. Browsers block it on `http://<IP>:3000` from a tablet, so use the Play link on the iPad for this game.
+
 ## Parent settings
 **Hold** the ⚙️ on the start screen for 2 seconds. A quick tap does nothing, so a toddler can't open it.
-- **Language:** English, हिन्दी (Hindi) or मराठी (Marathi). This is used by Animal Sounds, Color Pop and Coloring. The older games speak English for now.
+- **Language:** English, हिन्दी (Hindi) or मराठी (Marathi). This is used by Animal Sounds, Color Pop, Coloring and Talking Cat. The older games speak English for now.
 - **Sounds** and **voice** can be switched on or off.
 - **Reset** stars and letters.
 - Settings say which voice your device will use. Many devices have no Marathi voice; then a Hindi voice reads the Marathi words. If there is no Hindi voice either, names are still shown on screen and the sounds still play.
@@ -94,7 +102,7 @@ The game can make every sound by itself, but recordings replace them. Put `.mp3`
 | `index.html` | The page, including the cat, the dancing girl and the parent settings |
 | `style.css` | Colours, scenery and all animations |
 | `app.js` | The core: Shapes, Balloons and ABC, touch handling, sounds, voices, settings, confetti |
-| `games/animals.js`, `games/colors.js`, `games/coloring.js` | Animal Sounds, Color Pop and Coloring |
+| `games/animals.js`, `games/colors.js`, `games/coloring.js`, `games/talkingcat.js` | Animal Sounds, Color Pop, Coloring and Talking Cat |
 | `sounds/` | Recorded sounds (including `sounds/animals/`), plus a guide to the file names |
 | `icons/`, `manifest.webmanifest`, `sw.js` | App icon, "install as app" and offline support |
 | `run.bat`, `server.js` | Local server for playing on a tablet over home Wi-Fi |
