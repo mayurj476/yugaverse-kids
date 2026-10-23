@@ -1,6 +1,6 @@
 # YugaVerse Kids 🐮🎈🔤
 
-Seven gentle, colourful games for children around 2 years old: **shapes**, **balloons**, **ABC**, **animal sounds**, **colour pop**, **colouring** and a **talking cat**. They are made for small fingers that don't tap accurately yet. The animal, colour and colouring games speak **English, Hindi or Marathi**.
+Eight gentle, colourful games for children around 2 years old: **shapes**, **balloons**, **ABC**, **animal sounds**, **colour pop**, **colouring**, a **talking cat** and **body parts**. They are made for small fingers that don't tap accurately yet. The animal, colour and colouring games speak **English, Hindi or Marathi**.
 
 ### ▶ Play: **https://mayurj476.github.io/yugaverse-kids/**
 
@@ -64,9 +64,16 @@ The start screen has big picture cards, so a child who can't read can still choo
 - Without a microphone (permission refused, or no mic), the cat still reacts to taps and does its silly faces.
 - The microphone only works over **https** (the Play link) or on the computer running `run.bat`. Browsers block it on `http://<IP>:3000` from a tablet, so use the Play link on the iPad for this game.
 
+### 👶 Body Parts
+- A big, round 3D-style cartoon baby stands on the grass. One body part at a time glows, a spinning rainbow ring circles it, and its name pops up at the top in big letters.
+- The voice says the name loud ("Nose!"), then asks the child to join in ("Touch your nose!", "Clap your hands!").
+- The baby acts each one out: it nods its head, bounces its hair, blinks its eyes, wiggles its ears, boops its nose, opens its mouth, chomps its teeth, sticks its tongue out, raises its arms, waves and claps its hands, giggles with its tummy, jumps on its legs, bends its knees and stomps its feet.
+- There are 14 parts: head, hair, eyes, ears, nose, mouth, teeth, tongue, arms, hands, tummy, legs, knees and feet. The big green **▶ button at the bottom right** goes to the next one. Tapping a part on the baby shows that part straight away.
+- Dots under the word show how far the child has got. After all 14, the **clapping cat** celebrates and it starts again from the head.
+
 ## Parent settings
 **Hold** the ⚙️ on the start screen for 2 seconds. A quick tap does nothing, so a toddler can't open it.
-- **Language:** English, हिन्दी (Hindi) or मराठी (Marathi). This is used by Animal Sounds, Color Pop, Coloring and Talking Cat. The older games speak English for now.
+- **Language:** English, हिन्दी (Hindi) or मराठी (Marathi). This is used by Animal Sounds, Color Pop, Coloring, Talking Cat and Body Parts. The older games speak English for now.
 - **Sounds** and **voice** can be switched on or off.
 - **Reset** stars and letters.
 - Settings say which voice your device will use. Many devices have no Marathi voice; then a Hindi voice reads the Marathi words. If there is no Hindi voice either, names are still shown on screen and the sounds still play.
@@ -102,7 +109,7 @@ The game can make every sound by itself, but recordings replace them. Put `.mp3`
 | `index.html` | The page, including the cat, the dancing girl and the parent settings |
 | `style.css` | Colours, scenery and all animations |
 | `app.js` | The core: Shapes, Balloons and ABC, touch handling, sounds, voices, settings, confetti |
-| `games/animals.js`, `games/colors.js`, `games/coloring.js`, `games/talkingcat.js` | Animal Sounds, Color Pop, Coloring and Talking Cat |
+| `games/animals.js`, `games/colors.js`, `games/coloring.js`, `games/talkingcat.js`, `games/bodyparts.js` | Animal Sounds, Color Pop, Coloring, Talking Cat and Body Parts |
 | `sounds/` | Recorded sounds (including `sounds/animals/`), plus a guide to the file names |
 | `icons/`, `manifest.webmanifest`, `sw.js` | App icon, "install as app" and offline support |
 | `run.bat`, `server.js` | Local server for playing on a tablet over home Wi-Fi |

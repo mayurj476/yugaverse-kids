@@ -775,3 +775,90 @@ body.mode-custom #board { display: none; }
 .tcMic.none { opacity: .35; filter: grayscale(1); }
 .tcMic.none::after { content: ''; position: absolute; width: 60%; height: 4px; border-radius: 2px; background: #e33; transform: rotate(-45deg); }
 @keyframes tcMicPulse { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 64, .55); } 100% { box-shadow: 0 0 0 18px rgba(46, 204, 64, 0); } }
+
+/* ---------- Body Parts ---------- */
+.bpStage { position: absolute; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + 96px); bottom: 10px; display: flex; justify-content: center; align-items: flex-end; }
+.bpSvg { width: auto; max-width: calc(100% - 24px); display: block; overflow: visible; filter: drop-shadow(0 10px 12px rgba(0, 0, 0, .15)); }
+.bpSvg.enter { animation: bpIn .8s cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes bpIn { from { transform: translateY(40%) scale(.6); opacity: 0; } }
+.bpSvg .bpPart, .bpSvg .bpBaby, .bpSvg .bpLower, .bpSvg .bpUpper, .bpSvg .bpEar, .bpSvg .bpEye, .bpSvg .bpFoot, .bpSvg .bpHand, .bpSvg .bpHeadAll { transform-box: fill-box; transform-origin: center; }
+.bpPart.hl { animation: bpPulse 1s ease-in-out infinite; }
+@keyframes bpPulse { 50% { transform: scale(1.06); } }
+.bpRing { transform-box: view-box; animation: bpRingIn .45s cubic-bezier(.34, 1.56, .64, 1) both; }
+.bpRing ellipse { animation: bpSpin 1.6s linear infinite; }
+@keyframes bpRingIn { from { transform: scale(.3); opacity: 0; } }
+@keyframes bpSpin { to { stroke-dashoffset: -104; } }
+/* acting out each part */
+.bpSvg .bpBaby { transform-origin: 50% 100%; }
+.bpSvg .bpHeadAll { transform-origin: 50% 95%; }
+.bpSvg .bpHair { transform-origin: 50% 100%; }
+.bpSvg .bpSide { transform-box: view-box; }
+.bpSvg .bpSide.l { transform-origin: 144px 276px; }
+.bpSvg .bpSide.r { transform-origin: 256px 276px; }
+.bpSvg .bpHand { transform-origin: 50% 20%; }
+.bpSvg .bpFoot { transform-origin: 20% 100%; }
+.bpSvg .bpFoot.r { transform-origin: 80% 100%; }
+.do-head .bpHeadAll { animation: bpNod .7s ease-in-out 2; }
+.do-hair .bpHair.bpPart { animation: bpBoing .5s ease-in-out 3; }
+.do-eyes .bpEye { animation: bpBlink .4s ease 2 .1s; }
+.do-ears .bpEar.l { animation: bpWiggleL .3s ease-in-out 5; }
+.do-ears .bpEar.r { animation: bpWiggleR .3s ease-in-out 5; }
+.do-nose .bpNose.bpPart { animation: bpBoop .45s cubic-bezier(.34, 1.56, .64, 1) 2; }
+.bpSvg .bpMouthAll, .bpSvg .bpTongue { transform-box: fill-box; }
+.bpSvg .bpMouthAll { transform-origin: 50% 20%; }
+.bpSvg .bpTongue.bpPart { transform-origin: 50% 10%; }
+.do-mouth .bpMouthAll { animation: bpAah 1.2s ease-in-out; }
+.do-teeth .bpMouthAll { animation: bpChomp .35s ease-in-out 3 .05s; }
+.do-tongue .bpTongue.bpPart { animation: bpBlep 1.4s ease-in-out .1s; }
+@keyframes bpChomp { 50% { transform: scale(1.1, .55); } }
+@keyframes bpBlep { 20%, 80% { transform: translateY(9px) scale(1.15, 1.7); } 50% { transform: translateY(10px) scale(1.2, 1.8) rotate(4deg); } }
+.do-arms .bpSide.l { animation: bpRaiseL 1.5s ease-in-out; }
+.do-arms .bpSide.r { animation: bpRaiseR 1.5s ease-in-out; }
+.do-hands .bpHand { animation: bpWaveHand .4s ease-in-out 4; }
+.do-tummy .bpBaby { animation: bpJiggle .2s ease-in-out 7; }
+.do-legs .bpBaby { animation: bpJump .7s cubic-bezier(.3, .7, .4, 1) 2; }
+.do-knees .bpUpper { animation: bpSquat .75s ease-in-out 2; }
+.do-feet .bpFoot.l { animation: bpStomp .6s ease-in-out 3; }
+.do-feet .bpFoot.r { animation: bpStomp .6s ease-in-out 3 .3s; }
+@keyframes bpNod { 30% { transform: rotate(-7deg); } 70% { transform: rotate(7deg); } }
+@keyframes bpBoing { 50% { transform: scale(1.04, 1.14); } }
+@keyframes bpBlink { 50% { transform: scaleY(.08); } }
+@keyframes bpWiggleL { 50% { transform: rotate(-16deg); } }
+@keyframes bpWiggleR { 50% { transform: rotate(16deg); } }
+@keyframes bpBoop { 50% { transform: scale(1.45); } }
+@keyframes bpAah { 25%, 75% { transform: scale(1.35, 1.6); } }
+@keyframes bpRaiseL { 30%, 70% { transform: rotate(118deg); } }
+@keyframes bpRaiseR { 30%, 70% { transform: rotate(-118deg); } }
+@keyframes bpWaveHand { 50% { transform: rotate(24deg); } }
+@keyframes bpJiggle { 50% { transform: rotate(2.5deg) scale(1.02, .98); } }
+@keyframes bpJump { 15% { transform: scale(1.06, .92); } 50% { transform: translateY(-14%); } 85% { transform: scale(1.05, .94); } }
+@keyframes bpSquat { 50% { transform: translateY(5%); } }
+@keyframes bpStomp { 30% { transform: translateY(-10%) rotate(-8deg); } 55% { transform: none; } }
+.bpWord {
+  position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 12px); transform: translateX(-50%);
+  min-width: 140px; padding: 6px 26px; border-radius: 999px; background: rgba(255, 255, 255, .85);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, .08); text-align: center; pointer-events: none;
+  font: 800 clamp(34px, 7vw, 60px)/1.15 var(--font); white-space: nowrap;
+}
+.bpWord:empty { opacity: 0; }
+.bpWord span { display: inline-block; text-shadow: 0 3px 0 rgba(0, 0, 0, .12); }
+.bpWord.pop { animation: bpWordPop .5s cubic-bezier(.34, 1.56, .64, 1); }
+.bpWord.pop span { animation: bpLetter .5s cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes bpWordPop { from { transform: translateX(-50%) scale(.5); } }
+@keyframes bpLetter { from { transform: translateY(-40%) scale(.4); opacity: 0; } }
+.bpDots { position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 88px); transform: translateX(-50%); display: flex; gap: 6px; pointer-events: none; }
+.bpDots span { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, .7); box-shadow: inset 0 0 0 2px rgba(124, 92, 255, .3); transition: transform .2s; }
+.bpDots span.on { background: #ffd400; box-shadow: none; }
+.bpDots span.now { background: #ff5db1; box-shadow: none; transform: scale(1.4); }
+.bpNext {
+  position: absolute; right: calc(env(safe-area-inset-right, 0px) + 18px); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  width: clamp(84px, 13vmin, 120px); height: clamp(84px, 13vmin, 120px); border-radius: 50%; border: 0; padding: 0; cursor: pointer; z-index: 3;
+  background: radial-gradient(circle at 35% 28%, #b6ff9a, #2ecc40 55%, #178a26 100%);
+  box-shadow: 0 8px 0 #12701e, 0 14px 20px rgba(0, 0, 0, .2), inset 0 -6px 10px rgba(0, 0, 0, .15);
+  -webkit-tap-highlight-color: transparent;
+}
+.bpNext svg { width: 62%; height: 62%; display: block; margin: auto; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .2)); }
+.bpNext.press { animation: bpPress .3s ease; }
+.bpNext.nudge { animation: bpNudge .9s ease-in-out 3; }
+@keyframes bpPress { 40% { transform: translateY(6px) scale(.94); box-shadow: 0 2px 0 #12701e, 0 4px 8px rgba(0, 0, 0, .2); } }
+@keyframes bpNudge { 30% { transform: scale(1.15) rotate(-6deg); } 60% { transform: scale(1.1) rotate(6deg); } }

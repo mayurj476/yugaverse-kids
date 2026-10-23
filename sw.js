@@ -1,7 +1,7 @@
 // YugaVerse Kids - Copyright (c) 2026 mayurj476. All rights reserved.
 // Not for copying, reuse or redistribution without written permission. See LICENSE.
 // Offline support: the game keeps working with no internet after the first visit.
-const CACHE = 'yugaverse-kids-v9';
+const CACHE = 'yugaverse-kids-v10';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS = [
   './games/colors.js',
   './games/coloring.js',
   './games/talkingcat.js',
+  './games/bodyparts.js',
   './manifest.webmanifest',
   './icons/icon.svg',
   './icons/icon-180.png',
